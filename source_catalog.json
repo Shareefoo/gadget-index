@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "revision": 3,
+  "sources": [
+    {
+      "id": "android-security-bulletins",
+      "name": "Android Security Bulletins",
+      "kind": "updates",
+      "url": "https://source.android.com/docs/security/bulletin/asb-overview",
+      "types": ["Phone", "Tablet"],
+      "supersededBy": ["pixel-update-bulletins", "samsung-security-bulletins"]
+    },
+    {
+      "id": "pixel-update-bulletins",
+      "name": "Pixel Update Bulletins",
+      "kind": "updates",
+      "url": "https://source.android.com/docs/security/bulletin/pixel",
+      "types": ["Phone", "Tablet"],
+      "modelStartsWith": ["Google"],
+      "modelContains": ["Pixel"]
+    },
+    {
+      "id": "samsung-security-bulletins",
+      "name": "Samsung Security Updates",
+      "kind": "updates",
+      "url": "https://security.samsungmobile.com/securityUpdate.smsb",
+      "types": ["Phone", "Tablet"],
+      "modelStartsWith": ["Samsung", "Galaxy"]
+    },
+    {
+      "id": "google-android-blog",
+      "name": "Google Android blog",
+      "kind": "news",
+      "url": "https://blog.google/products-and-platforms/platforms/android/rss/",
+      "types": ["Phone", "Tablet"]
+    },
+    {
+      "id": "google-pixel-blog",
+      "name": "Google Pixel blog",
+      "kind": "news",
+      "url": "https://blog.google/products-and-platforms/devices/pixel/rss/",
+      "types": ["Phone", "Tablet", "Watch", "Headphones"],
+      "modelStartsWith": ["Google", "Pixel"],
+      "modelContains": ["Pixel"]
+    },
+    {
+      "id": "google-wear-os-blog",
+      "name": "Google Wear OS blog",
+      "kind": "news",
+      "url": "https://blog.google/products-and-platforms/platforms/wear-os/rss/",
+      "types": ["Watch"],
+      "modelContains": ["Pixel Watch", "Galaxy Watch", "TicWatch", "Wear OS"]
+    },
+    {
+      "id": "samsung-mobile-news",
+      "name": "Samsung Newsroom: Mobile",
+      "kind": "news",
+      "url": "https://news.samsung.com/global/category/products/mobile/feed",
+      "types": ["Phone", "Tablet", "Watch", "Headphones"],
+      "modelStartsWith": ["Samsung", "Galaxy"]
+    },
+    {
+      "id": "garmin-blog",
+      "name": "Garmin Blog",
+      "kind": "news",
+      "url": "https://www.garmin.com/en-US/blog/feed/",
+      "modelStartsWith": ["Garmin"]
+    }
+  ]
+}

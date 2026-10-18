@@ -1,0 +1,225 @@
+#!/usr/bin/env python3
+"""Validates the two catalogue files the app downloads and bundles.
+
+    python tools/validate_catalog.py                  # check both files
+    python tools/validate_catalog.py --base origin/master   # also require a revision bump
+
+The files live in the repository root:
+  source_catalog.json  which update and news sources a device gets
+  device_models.json   model names for the Add device picker
+
+The rules mirror SourceCatalog.kt and ModelList.kt in the Kithub app: the app skips a bad entry silently, so
+this script is where a typo is caught instead. Exit code 0 = valid, 1 = problems found.
+Standard library only.
+"""
+
+import argparse
+import json
+import subprocess
+import sys
+from pathlib import Path
+from urllib.parse import urlparse
+
+ROOT = Path(__file__).resolve().parent.parent
+SOURCES = ROOT / "source_catalog.json"
+MODELS = ROOT / "device_models.json"
+
+SUPPORTED_SCHEMA = 1
+DEVICE_TYPES = {"Phone", "Watch", "Headphones", "Laptop", "Tablet", "Other"}
+KINDS = {"updates", "news"}
+SOURCE_KEYS = {"id", "name", "kind", "url", "types", "modelStartsWith", "modelContains", "supersededBy"}
+GROUP_KEYS = {"type", "brand", "names"}
+
+
+class Problems:
+    def __init__(self, label):
+        self.label = label
+        self.items = []
+
+    def add(self, where, message):
+        self.items.append(f"{self.label}: {where}: {message}")
+
+
+def load(path, problems):
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        problems.add(path.name, "file not found")
+        return None
+    except json.JSONDecodeError as e:
+        problems.add(path.name, f"not valid JSON ({e})")
+        return None
+    if not isinstance(data, dict):
+        problems.add(path.name, "top level must be an object")
+        return None
+    version = data.get("schemaVersion")
+    if not isinstance(version, int) or isinstance(version, bool) or not 1 <= version <= SUPPORTED_SCHEMA:
+        problems.add("schemaVersion", f"must be an integer from 1 to {SUPPORTED_SCHEMA}, is {version!r}")
+        return None
+    return data
+
+
+def string_list(entry, key, where, problems, allow_empty=True):
+    value = entry.get(key, [])
+    if not isinstance(value, list) or not all(isinstance(v, str) and v.strip() for v in value):
+        problems.add(where, f'"{key}" must be a list of non-empty strings')
+        return []
+    if not allow_empty and not value:
+        problems.add(where, f'"{key}" must not be empty')
+    return value
+
+
+def check_revision(data, problems):
+    revision = data.get("revision")
+    if not isinstance(revision, int) or isinstance(revision, bool) or revision < 1:
+        problems.add("revision", f"must be an integer of 1 or more, is {revision!r}")
+
+
+def check_sources(data, problems):
+    check_revision(data, problems)
+    sources = data.get("sources")
+    if not isinstance(sources, list) or not sources:
+        problems.add("sources", "must be a non-empty list")
+        return
+    ids = [s.get("id") for s in sources if isinstance(s, dict)]
+    seen = set()
+    for index, source in enumerate(sources):
+        where = f"sources[{index}]"
+        if not isinstance(source, dict):
+            problems.add(where, "must be an object")
+            continue
+        sid = source.get("id")
+        where = f'sources[{index}] ({sid})'
+        for key in ("id", "name", "url"):
+            if not isinstance(source.get(key), str) or not source[key].strip():
+                problems.add(where, f'"{key}" is required')
+        if isinstance(sid, str):
+            if sid in seen:
+                problems.add(where, "duplicate id")
+            seen.add(sid)
+        if source.get("kind") not in KINDS:
+            problems.add(where, f'"kind" must be one of {sorted(KINDS)}')
+        url = source.get("url")
+        if isinstance(url, str):
+            parsed = urlparse(url.strip())
+            if parsed.scheme != "https" or "." not in (parsed.hostname or ""):
+                problems.add(where, f"url must be https with a host: {url}")
+        types = string_list(source, "types", where, problems)
+        for t in types:
+            if t not in DEVICE_TYPES:
+                problems.add(where, f'unknown device type "{t}" (use {sorted(DEVICE_TYPES)})')
+        string_list(source, "modelStartsWith", where, problems)
+        string_list(source, "modelContains", where, problems)
+        for ref in string_list(source, "supersededBy", where, problems):
+            if ref == sid:
+                problems.add(where, "supersededBy points at itself")
+            elif ref not in ids:
+                problems.add(where, f'supersededBy "{ref}" is not a source id')
+        for key in source:
+            if key not in SOURCE_KEYS:
+                problems.add(where, f'unknown field "{key}" (the app ignores it)')
+
+
+def check_models(data, problems):
+    check_revision(data, problems)
+    groups = data.get("groups")
+    if not isinstance(groups, list) or not groups:
+        problems.add("groups", "must be a non-empty list")
+        return
+    seen = {}
+    for index, group in enumerate(groups):
+        where = f"groups[{index}]"
+        if not isinstance(group, dict):
+            problems.add(where, "must be an object")
+            continue
+        gtype = group.get("type")
+        if gtype not in DEVICE_TYPES:
+            problems.add(where, f'"type" must be one of {sorted(DEVICE_TYPES)}, is {gtype!r}')
+        brand = group.get("brand", "")
+        if not isinstance(brand, str):
+            problems.add(where, '"brand" must be a string ("" when names already include it)')
+            brand = ""
+        names = string_list(group, "names", where, problems, allow_empty=False)
+        for name in names:
+            if len(name.strip()) < 2:
+                problems.add(where, f'name "{name}" is too short')
+            shown = name if brand and name.lower().startswith(brand.lower()) else f"{brand} {name}".strip()
+            key = (gtype, shown.lower())
+            if key in seen:
+                problems.add(where, f'"{shown}" is listed twice ({gtype})')
+            seen[key] = True
+        for key in group:
+            if key not in GROUP_KEYS:
+                problems.add(where, f'unknown field "{key}" (the app ignores it)')
+
+
+def git_show(ref, path):
+    rel = path.relative_to(ROOT).as_posix()
+    result = subprocess.run(
+        ["git", "show", f"{ref}:{rel}"], cwd=ROOT, capture_output=True, text=True, encoding="utf-8"
+    )
+    return result.stdout if result.returncode == 0 else None
+
+
+def check_revision_bump(path, base, problems):
+    """A changed file with the same revision never reaches installs that already have the old one."""
+    old_text = git_show(base, path)
+    if old_text is None:
+        return  # new file: nothing to compare with
+    new_text = path.read_text(encoding="utf-8")
+    try:
+        old, new = json.loads(old_text), json.loads(new_text)
+    except json.JSONDecodeError:
+        return
+    if old == new:
+        return
+    if not new.get("revision", 0) > old.get("revision", 0):
+        problems.add(
+            "revision",
+            f"{path.name} changed but revision is still {new.get('revision')}: bump it "
+            f"(was {old.get('revision')} on {base})",
+        )
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--base", help="git ref to compare against (e.g. origin/master) and require a revision bump")
+    args = parser.parse_args()
+
+    all_problems = []
+
+    p = Problems("source_catalog.json")
+    data = load(SOURCES, p)
+    if data is not None:
+        check_sources(data, p)
+        if args.base:
+            check_revision_bump(SOURCES, args.base, p)
+    all_problems += p.items
+    count = len(data.get("sources", [])) if isinstance(data, dict) else 0
+
+    q = Problems("device_models.json")
+    models = load(MODELS, q)
+    if models is not None:
+        check_models(models, q)
+        if args.base:
+            check_revision_bump(MODELS, args.base, q)
+    all_problems += q.items
+    names = sum(
+        len(g.get("names", [])) for g in (models or {}).get("groups", []) if isinstance(g, dict)
+        and isinstance(g.get("names"), list)
+    )
+
+    if all_problems:
+        print("Catalogue is not valid:")
+        for line in all_problems:
+            print("  -", line)
+        return 1
+    print(
+        f"OK: source_catalog.json revision {data.get('revision')}, {count} sources; "
+        f"device_models.json revision {models.get('revision')}, {names} model names"
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

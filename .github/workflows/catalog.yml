@@ -1,0 +1,60 @@
+name: Catalogue
+
+# Checks the two catalogue JSON files on every change, and publishes them with GitHub Pages
+# when they change on the default branch. The app downloads them from the Pages address (see README.md).
+
+on:
+  pull_request:
+    paths:
+      - "source_catalog.json"
+      - "device_models.json"
+      - "tools/validate_catalog.py"
+  push:
+    branches: [main, master]
+    paths:
+      - "source_catalog.json"
+      - "device_models.json"
+      - "tools/validate_catalog.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate (and require a revision bump on pull requests)
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            python3 tools/validate_catalog.py --base "origin/${{ github.base_ref }}"
+          else
+            python3 tools/validate_catalog.py
+          fi
+
+  publish:
+    # Runs only after a validated push to the default branch. Pages must be set to "GitHub Actions" in the
+    # repository settings first.
+    needs: validate
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Collect the files to publish
+        run: |
+          mkdir -p _site
+          cp source_catalog.json device_models.json _site/
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

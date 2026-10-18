@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "groups": [
+    {
+      "type": "Watch", "brand": "Apple",
+      "names": ["Watch Series 9", "Watch Series 10", "Watch Series 11", "Watch SE (2nd generation)", "Watch SE 3", "Watch Ultra", "Watch Ultra 2", "Watch Ultra 3"]
+    },
+    {
+      "type": "Watch", "brand": "Samsung",
+      "names": ["Galaxy Watch4", "Galaxy Watch4 Classic", "Galaxy Watch5", "Galaxy Watch5 Pro", "Galaxy Watch6", "Galaxy Watch6 Classic", "Galaxy Watch7", "Galaxy Watch Ultra", "Galaxy Watch8", "Galaxy Watch8 Classic", "Galaxy Fit3"]
+    },
+    {
+      "type": "Watch", "brand": "Google",
+      "names": ["Pixel Watch", "Pixel Watch 2", "Pixel Watch 3", "Pixel Watch 4", "Pixel Watch 5"]
+    },
+    {
+      "type": "Watch", "brand": "Fitbit",
+      "names": ["Charge 6", "Versa 4", "Sense 2", "Inspire 3"]
+    },
+    {
+      "type": "Watch", "brand": "Garmin",
+      "names": ["Fenix 7", "Fenix 8", "Forerunner 165", "Forerunner 265", "Forerunner 570", "Forerunner 965", "Forerunner 970", "Venu 3", "Venu 4", "Vivoactive 5", "Vivoactive 6", "Instinct 3", "Enduro 3", "Epix Pro (Gen 2)", "MARQ (Gen 3)", "Lily 2"]
+    },
+    {
+      "type": "Watch", "brand": "",
+      "names": ["OnePlus Watch 2", "Mobvoi TicWatch Pro 5", "Huawei Watch GT 5", "Huawei Watch Fit 3", "Amazfit Balance", "Amazfit GTR 4", "Polar Vantage V3", "Polar Pacer Pro", "Coros Pace 3", "Suunto Race", "Withings ScanWatch 2"]
+    },
+    {
+      "type": "Headphones", "brand": "Apple",
+      "names": ["AirPods (3rd generation)", "AirPods 4", "AirPods 4 with Active Noise Cancellation", "AirPods Pro (2nd generation)", "AirPods Pro 3", "AirPods Max"]
+    },
+    {
+      "type": "Headphones", "brand": "Samsung",
+      "names": ["Galaxy Buds2", "Galaxy Buds2 Pro", "Galaxy Buds FE", "Galaxy Buds3", "Galaxy Buds3 Pro", "Galaxy Buds Core"]
+    },
+    {
+      "type": "Headphones", "brand": "Google",
+      "names": ["Pixel Buds Pro", "Pixel Buds Pro 2", "Pixel Buds A-Series", "Pixel Buds 2a"]
+    },
+    {
+      "type": "Headphones", "brand": "Sony",
+      "names": ["WH-1000XM4", "WH-1000XM5", "WH-1000XM6", "WF-1000XM4", "WF-1000XM5", "LinkBuds S", "LinkBuds Fit", "WH-CH720N", "WH-CH520"]
+    },
+    {
+      "type": "Headphones", "brand": "Bose",
+      "names": ["QuietComfort Ultra Headphones", "QuietComfort Headphones", "QuietComfort Ultra Earbuds", "QuietComfort Earbuds II", "QuietComfort 45", "Noise Cancelling Headphones 700", "Ultra Open Earbuds", "Sport Earbuds"]
+    },
+    {
+      "type": "Headphones", "brand": "Beats",
+      "names": ["Studio Pro", "Solo 4", "Fit Pro", "Powerbeats Pro 2", "Studio Buds +"]
+    },
+    {
+      "type": "Headphones", "brand": "",
+      "names": ["Sennheiser Momentum 4 Wireless", "Sennheiser Momentum True Wireless 4", "Sennheiser Accentum Wireless", "Jabra Elite 8 Active", "Jabra Elite 10", "Nothing Ear", "Nothing Ear (a)", "Nothing Headphone (1)", "OnePlus Buds 3", "OnePlus Buds Pro 3", "Soundcore Liberty 4 NC", "Soundcore Space One"]
+    }
+  ]
+}

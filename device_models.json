@@ -1,14 +1,14 @@
 {
   "schemaVersion": 1,
-  "revision": 1,
+  "revision": 3,
   "groups": [
     {
       "type": "Watch", "brand": "Apple",
-      "names": ["Watch Series 9", "Watch Series 10", "Watch Series 11", "Watch SE (2nd generation)", "Watch SE 3", "Watch Ultra", "Watch Ultra 2", "Watch Ultra 3"]
+      "names": ["Watch Series 7", "Watch Series 8", "Watch Series 9", "Watch Series 10", "Watch Series 11", "Watch SE (2nd generation)", "Watch SE 3", "Watch Ultra", "Watch Ultra 2", "Watch Ultra 3"]
     },
     {
       "type": "Watch", "brand": "Samsung",
-      "names": ["Galaxy Watch4", "Galaxy Watch4 Classic", "Galaxy Watch5", "Galaxy Watch5 Pro", "Galaxy Watch6", "Galaxy Watch6 Classic", "Galaxy Watch7", "Galaxy Watch Ultra", "Galaxy Watch8", "Galaxy Watch8 Classic", "Galaxy Fit3"]
+      "names": ["Galaxy Watch Active2", "Galaxy Watch3", "Galaxy Watch4", "Galaxy Watch4 Classic", "Galaxy Watch5", "Galaxy Watch5 Pro", "Galaxy Watch6", "Galaxy Watch6 Classic", "Galaxy Watch7", "Galaxy Watch FE", "Galaxy Watch Ultra", "Galaxy Watch8", "Galaxy Watch8 Classic", "Galaxy Fit3"]
     },
     {
       "type": "Watch", "brand": "Google",
@@ -16,43 +16,215 @@
     },
     {
       "type": "Watch", "brand": "Fitbit",
-      "names": ["Charge 6", "Versa 4", "Sense 2", "Inspire 3"]
+      "names": ["Charge 5", "Charge 6", "Versa 3", "Versa 4", "Sense", "Sense 2", "Inspire 2", "Inspire 3", "Luxe", "Ace LTE"]
     },
     {
       "type": "Watch", "brand": "Garmin",
-      "names": ["Fenix 7", "Fenix 8", "Forerunner 165", "Forerunner 265", "Forerunner 570", "Forerunner 965", "Forerunner 970", "Venu 3", "Venu 4", "Vivoactive 5", "Vivoactive 6", "Instinct 3", "Enduro 3", "Epix Pro (Gen 2)", "MARQ (Gen 3)", "Lily 2"]
+      "names": ["Fenix 6", "Fenix 7", "Fenix 8", "Forerunner 55", "Forerunner 165", "Forerunner 255", "Forerunner 265", "Forerunner 570", "Forerunner 955", "Forerunner 965", "Forerunner 970", "Venu 2", "Venu 3", "Venu 4", "Venu Sq 2", "Vivoactive 5", "Vivoactive 6", "Vivomove Trend", "Vivosmart 5", "Instinct 2", "Instinct 3", "Enduro 2", "Enduro 3", "Epix (Gen 2)", "Epix Pro (Gen 2)", "Tactix 8", "MARQ (Gen 3)", "Lily", "Lily 2"]
     },
     {
-      "type": "Watch", "brand": "",
-      "names": ["OnePlus Watch 2", "Mobvoi TicWatch Pro 5", "Huawei Watch GT 5", "Huawei Watch Fit 3", "Amazfit Balance", "Amazfit GTR 4", "Polar Vantage V3", "Polar Pacer Pro", "Coros Pace 3", "Suunto Race", "Withings ScanWatch 2"]
+      "type": "Watch", "brand": "Nothing",
+      "names": ["CMF Watch Pro", "CMF Watch Pro 2", "CMF Watch 2 Pro", "CMF Watch 3 Pro"]
+    },
+    {
+      "type": "Watch", "brand": "OnePlus",
+      "names": ["Watch", "Watch 2", "Watch 2R", "Watch 3", "Nord Watch"]
+    },
+    {
+      "type": "Watch", "brand": "Huawei",
+      "names": ["Watch GT 3", "Watch GT 3 Pro", "Watch GT 4", "Watch GT 5", "Watch GT 5 Pro", "Watch GT 6", "Watch GT 6 Pro", "Watch D2", "Watch Fit 2", "Watch Fit 3", "Watch Fit 4", "Watch Fit 4 Pro", "Watch Ultimate", "Watch 4 Pro", "Band 9"]
+    },
+    {
+      "type": "Watch", "brand": "Amazfit",
+      "names": ["Balance", "Active", "Active 2", "Active Edge", "Bip 5", "Bip 6", "Cheetah Pro", "Falcon", "GTR 4", "GTS 4", "GTS 4 Mini", "Helio Strap", "T-Rex 3", "T-Rex Ultra", "Band 7"]
+    },
+    {
+      "type": "Watch", "brand": "Mobvoi",
+      "names": ["TicWatch Pro 3", "TicWatch Pro 5", "TicWatch Pro 5 Enduro", "TicWatch E3"]
+    },
+    {
+      "type": "Watch", "brand": "Polar",
+      "names": ["Vantage V3", "Pacer", "Pacer Pro", "Grit X2 Pro", "Grit X Pro", "Ignite 3", "Unite", "Vantage M2"]
+    },
+    {
+      "type": "Watch", "brand": "Coros",
+      "names": ["Pace 3", "Pace Pro", "Apex 2", "Apex 2 Pro", "Vertix 2", "Vertix 2S", "Nomad"]
+    },
+    {
+      "type": "Watch", "brand": "Suunto",
+      "names": ["Race", "Race S", "Vertical", "Ocean", "9 Peak Pro", "5 Peak", "Run"]
+    },
+    {
+      "type": "Watch", "brand": "Withings",
+      "names": ["ScanWatch 2", "ScanWatch Light", "ScanWatch Nova", "Steel HR"]
+    },
+    {
+      "type": "Watch", "brand": "Xiaomi",
+      "names": ["Watch S3", "Watch S4", "Watch 2 Pro", "Smart Band 8", "Smart Band 9", "Smart Band 9 Pro", "Redmi Watch 5"]
+    },
+    {
+      "type": "Watch", "brand": "Honor",
+      "names": ["Watch 4 Pro", "Watch GS 3", "Watch GS Pro", "Band 9"]
+    },
+    {
+      "type": "Watch", "brand": "Oppo",
+      "names": ["Watch X", "Watch X2", "Watch 4 Pro", "Watch Free"]
+    },
+    {
+      "type": "Watch", "brand": "Realme",
+      "names": ["Watch S", "Watch S2", "Watch 3 Pro"]
+    },
+    {
+      "type": "Watch", "brand": "Casio",
+      "names": ["G-Shock GBD-H2000", "G-Shock GBD-200", "WSD-F30"]
+    },
+    {
+      "type": "Watch", "brand": "Fossil",
+      "names": ["Gen 6", "Gen 5", "Gen 6 Wellness"]
+    },
+    {
+      "type": "Watch", "brand": "Zepp",
+      "names": ["E", "Z"]
+    },
+    {
+      "type": "Watch", "brand": "Whoop",
+      "names": ["4.0", "5.0", "5.0 MG"]
+    },
+    {
+      "type": "Watch", "brand": "Oura",
+      "names": ["Ring Gen3", "Ring 4"]
     },
     {
       "type": "Headphones", "brand": "Apple",
-      "names": ["AirPods (3rd generation)", "AirPods 4", "AirPods 4 with Active Noise Cancellation", "AirPods Pro (2nd generation)", "AirPods Pro 3", "AirPods Max"]
+      "names": ["AirPods (2nd generation)", "AirPods (3rd generation)", "AirPods 4", "AirPods 4 with Active Noise Cancellation", "AirPods Pro (1st generation)", "AirPods Pro (2nd generation)", "AirPods Pro 3", "AirPods Max", "AirPods (1st generation)"]
     },
     {
       "type": "Headphones", "brand": "Samsung",
-      "names": ["Galaxy Buds2", "Galaxy Buds2 Pro", "Galaxy Buds FE", "Galaxy Buds3", "Galaxy Buds3 Pro", "Galaxy Buds Core"]
+      "names": ["Galaxy Buds", "Galaxy Buds+", "Galaxy Buds Live", "Galaxy Buds Pro", "Galaxy Buds2", "Galaxy Buds2 Pro", "Galaxy Buds FE", "Galaxy Buds3", "Galaxy Buds3 Pro", "Galaxy Buds Core"]
     },
     {
       "type": "Headphones", "brand": "Google",
-      "names": ["Pixel Buds Pro", "Pixel Buds Pro 2", "Pixel Buds A-Series", "Pixel Buds 2a"]
+      "names": ["Pixel Buds", "Pixel Buds Pro", "Pixel Buds Pro 2", "Pixel Buds A-Series", "Pixel Buds 2a"]
     },
     {
       "type": "Headphones", "brand": "Sony",
-      "names": ["WH-1000XM4", "WH-1000XM5", "WH-1000XM6", "WF-1000XM4", "WF-1000XM5", "LinkBuds S", "LinkBuds Fit", "WH-CH720N", "WH-CH520"]
+      "names": ["WH-1000XM3", "WH-1000XM4", "WH-1000XM5", "WH-1000XM6", "WF-1000XM3", "WF-1000XM4", "WF-1000XM5", "WF-C500", "WF-C700N", "LinkBuds", "LinkBuds S", "LinkBuds Fit", "LinkBuds Open", "ULT Wear", "WH-CH720N", "WH-CH520", "WH-XB910N", "WH-1000XM2", "WF-1000X", "WH-XB900N", "WF-XB700", "WH-CH710N", "WF-LS900N"]
     },
     {
       "type": "Headphones", "brand": "Bose",
-      "names": ["QuietComfort Ultra Headphones", "QuietComfort Headphones", "QuietComfort Ultra Earbuds", "QuietComfort Earbuds II", "QuietComfort 45", "Noise Cancelling Headphones 700", "Ultra Open Earbuds", "Sport Earbuds"]
+      "names": ["QuietComfort Ultra Headphones", "QuietComfort Headphones", "QuietComfort Ultra Earbuds", "QuietComfort Earbuds", "QuietComfort Earbuds II", "QuietComfort 35 II", "QuietComfort 45", "Noise Cancelling Headphones 700", "Ultra Open Earbuds", "Sport Earbuds", "SoundSport Free", "Sleepbuds II", "QuietComfort Ultra Gen 2", "QuietComfort SE", "Frames"]
     },
     {
       "type": "Headphones", "brand": "Beats",
-      "names": ["Studio Pro", "Solo 4", "Fit Pro", "Powerbeats Pro 2", "Studio Buds +"]
+      "names": ["Studio3", "Studio Pro", "Solo3", "Solo 4", "Solo Buds", "Fit Pro", "Flex", "Powerbeats Pro", "Powerbeats Pro 2", "Studio Buds", "Studio Buds +", "Solo Pro", "Studio Buds + (Transparent)", "Beats Pill"]
     },
     {
-      "type": "Headphones", "brand": "",
-      "names": ["Sennheiser Momentum 4 Wireless", "Sennheiser Momentum True Wireless 4", "Sennheiser Accentum Wireless", "Jabra Elite 8 Active", "Jabra Elite 10", "Nothing Ear", "Nothing Ear (a)", "Nothing Headphone (1)", "OnePlus Buds 3", "OnePlus Buds Pro 3", "Soundcore Liberty 4 NC", "Soundcore Space One"]
+      "type": "Headphones", "brand": "Nothing",
+      "names": ["Ear (1)", "Ear (2)", "Ear (3)", "Ear (a)", "Ear (stick)", "Ear (open)", "Headphone (1)", "CMF Buds", "CMF Buds Pro", "CMF Buds Pro 2", "CMF Buds 2", "CMF Headphone Pro"]
+    },
+    {
+      "type": "Headphones", "brand": "Sennheiser",
+      "names": ["Momentum 3 Wireless", "Momentum 4 Wireless", "Momentum True Wireless 3", "Momentum True Wireless 4", "Momentum Sport", "Accentum Wireless", "Accentum Plus Wireless", "Accentum True Wireless", "CX True Wireless", "CX Plus True Wireless", "HD 350BT", "HD 450BT", "HD 560S"]
+    },
+    {
+      "type": "Headphones", "brand": "OnePlus",
+      "names": ["Buds Z2", "Buds Pro", "Buds Pro 2", "Buds Pro 3", "Buds 3", "Nord Buds 2", "Nord Buds 3", "Nord Buds 3 Pro", "Bullets Wireless Z2"]
+    },
+    {
+      "type": "Headphones", "brand": "Jabra",
+      "names": ["Elite 3", "Elite 4", "Elite 4 Active", "Elite 5", "Elite 7 Active", "Elite 7 Pro", "Elite 8 Active", "Elite 10", "Elite 85t", "Elite 85h", "Elite Active 75t", "Evolve2 65", "Evolve2 85", "Evolve2 Buds"]
+    },
+    {
+      "type": "Headphones", "brand": "Soundcore",
+      "names": ["Liberty 3 Pro", "Liberty 4", "Liberty 4 NC", "Liberty 4 Pro", "Liberty 5", "Liberty Air 2 Pro", "P3i", "P40i", "R50i", "Life P3", "Life Q30", "Life Q35", "Space One", "Space One Pro", "Space Q45", "Space A40", "AeroFit", "AeroFit Pro", "Sleep A20"]
+    },
+    {
+      "type": "Headphones", "brand": "JBL",
+      "names": ["Tune 130NC", "Tune 230NC", "Tune 520BT", "Tune 670NC", "Tune 770NC", "Tune Beam", "Tune Buds", "Live Pro 2", "Live Buds 3", "Live 770NC", "Live 660NC", "Endurance Peak 3", "Vibe Beam", "Club Pro+", "Reflect Flow Pro", "Quantum TWS", "Quantum 360"]
+    },
+    {
+      "type": "Headphones", "brand": "Skullcandy",
+      "names": ["Crusher ANC 2", "Crusher Evo", "Hesh ANC", "Hesh Evo", "Indy Evo", "Dime 3", "Sesh Evo", "Push Active", "Rail ANC", "Method 360 ANC"]
+    },
+    {
+      "type": "Headphones", "brand": "Marshall",
+      "names": ["Major IV", "Major V", "Monitor II A.N.C.", "Motif II A.N.C.", "Minor IV", "Mode II"]
+    },
+    {
+      "type": "Headphones", "brand": "Bang & Olufsen",
+      "names": ["Beoplay H95", "Beoplay H100", "Beoplay H9", "Beoplay HX", "Beoplay EX", "Beoplay E8 3rd Gen", "Beoplay EQ", "Beoplay Eleven"]
+    },
+    {
+      "type": "Headphones", "brand": "Huawei",
+      "names": ["FreeBuds Pro 3", "FreeBuds Pro 4", "FreeBuds 5", "FreeBuds 5i", "FreeBuds SE 2", "FreeBuds Studio", "FreeClip"]
+    },
+    {
+      "type": "Headphones", "brand": "Xiaomi",
+      "names": ["Redmi Buds 5", "Redmi Buds 5 Pro", "Redmi Buds 6 Pro", "Buds 4 Pro", "Buds 5 Pro", "Buds 3T Pro"]
+    },
+    {
+      "type": "Headphones", "brand": "Realme",
+      "names": ["Buds Air 5", "Buds Air 5 Pro", "Buds Air 6", "Buds T300", "Buds Q2s", "Buds Wireless 3"]
+    },
+    {
+      "type": "Headphones", "brand": "Oppo",
+      "names": ["Enco X2", "Enco X3", "Enco Air3", "Enco Air3 Pro", "Enco Buds2"]
+    },
+    {
+      "type": "Headphones", "brand": "Honor",
+      "names": ["Earbuds 3 Pro", "Choice Earbuds X5", "Earbuds X6"]
+    },
+    {
+      "type": "Headphones", "brand": "Edifier",
+      "names": ["W820NB", "W830NB", "NeoBuds Pro 2", "X3s", "TWS1 Pro 2"]
+    },
+    {
+      "type": "Headphones", "brand": "1MORE",
+      "names": ["SonoFlow", "ComfoBuds Pro", "Aero", "EVO", "PistonBuds Pro"]
+    },
+    {
+      "type": "Headphones", "brand": "Audio-Technica",
+      "names": ["ATH-M50xBT2", "ATH-M20xBT", "ATH-S300BT", "ATH-SQ1TW", "ATH-CKS50TW", "ATH-ANC900BT"]
+    },
+    {
+      "type": "Headphones", "brand": "Technics",
+      "names": ["EAH-AZ80", "EAH-AZ60M2", "EAH-A800"]
+    },
+    {
+      "type": "Headphones", "brand": "Shokz",
+      "names": ["OpenRun Pro 2", "OpenRun", "OpenMove", "OpenFit", "OpenFit Air", "OpenDots ONE"]
+    },
+    {
+      "type": "Headphones", "brand": "Bowers & Wilkins",
+      "names": ["Px7 S2", "Px7 S2e", "Px8", "Pi7 S2", "Pi5 S2"]
+    },
+    {
+      "type": "Headphones", "brand": "Master & Dynamic",
+      "names": ["MW75", "MW08", "MW09"]
+    },
+    {
+      "type": "Headphones", "brand": "Plantronics",
+      "names": ["BackBeat Pro 2", "Voyager Focus 2"]
+    },
+    {
+      "type": "Headphones", "brand": "Razer",
+      "names": ["Hammerhead True Wireless", "Barracuda X", "Opus X"]
+    },
+    {
+      "type": "Headphones", "brand": "Logitech",
+      "names": ["G435", "G735", "Zone Vibe 100"]
+    },
+    {
+      "type": "Headphones", "brand": "Philips",
+      "names": ["Fidelio L4", "TAH5209", "TAT5506", "TAT8506"]
+    },
+    {
+      "type": "Headphones", "brand": "Motorola",
+      "names": ["Moto Buds", "Moto Buds+", "Moto Buds Loop"]
+    },
+    {
+      "type": "Headphones", "brand": "Nokia",
+      "names": ["Go Earbuds+", "Power Earbuds Lite"]
     }
   ]
 }

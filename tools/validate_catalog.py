@@ -29,6 +29,13 @@ DEVICE_TYPES = {"Phone", "Watch", "Headphones", "Laptop", "Tablet", "Other"}
 KINDS = {"updates", "news"}
 SOURCE_KEYS = {"id", "name", "kind", "url", "types", "modelStartsWith", "modelContains", "supersededBy", "filterByModel"}
 GROUP_KEYS = {"type", "brand", "names"}
+# The same limits as the app (SourceCatalog.kt / ModelList.kt): it skips anything beyond them.
+MAX_SOURCES = 200
+MAX_URL_LENGTH = 2048
+MAX_TEXT_LENGTH = 120
+MAX_LIST_SIZE = 50
+MAX_NAME_LENGTH = 100
+MAX_NAMES = 50_000
 
 
 class Problems:
@@ -66,6 +73,12 @@ def string_list(entry, key, where, problems, allow_empty=True):
         return []
     if not allow_empty and not value:
         problems.add(where, f'"{key}" must not be empty')
+    # Model names have their own, larger limits (check_models).
+    if key != "names":
+        if len(value) > MAX_LIST_SIZE:
+            problems.add(where, f'"{key}" has {len(value)} entries; the app reads at most {MAX_LIST_SIZE}')
+        if any(len(item) > MAX_TEXT_LENGTH for item in value):
+            problems.add(where, f'"{key}" has an entry longer than {MAX_TEXT_LENGTH} characters')
     return value
 
 
@@ -81,6 +94,8 @@ def check_sources(data, problems):
     if not isinstance(sources, list) or not sources:
         problems.add("sources", "must be a non-empty list")
         return
+    if len(sources) > MAX_SOURCES:
+        problems.add("sources", f"{len(sources)} sources; the app reads at most {MAX_SOURCES}")
     ids = [s.get("id") for s in sources if isinstance(s, dict)]
     seen = set()
     for index, source in enumerate(sources):
@@ -97,10 +112,15 @@ def check_sources(data, problems):
             if sid in seen:
                 problems.add(where, "duplicate id")
             seen.add(sid)
+        for key in ("id", "name"):
+            if isinstance(source.get(key), str) and len(source[key]) > MAX_TEXT_LENGTH:
+                problems.add(where, f'"{key}" is longer than {MAX_TEXT_LENGTH} characters')
         if source.get("kind") not in KINDS:
             problems.add(where, f'"kind" must be one of {sorted(KINDS)}')
         url = source.get("url")
         if isinstance(url, str):
+            if len(url.strip()) > MAX_URL_LENGTH:
+                problems.add(where, f"url is longer than {MAX_URL_LENGTH} characters")
             parsed = urlparse(url.strip())
             if parsed.scheme != "https" or "." not in (parsed.hostname or ""):
                 problems.add(where, f"url must be https with a host: {url}")
@@ -108,8 +128,14 @@ def check_sources(data, problems):
         for t in types:
             if t not in DEVICE_TYPES:
                 problems.add(where, f'unknown device type "{t}" (use {sorted(DEVICE_TYPES)})')
-        string_list(source, "modelStartsWith", where, problems)
-        string_list(source, "modelContains", where, problems)
+        starts = string_list(source, "modelStartsWith", where, problems)
+        contains = string_list(source, "modelContains", where, problems)
+        if not types and not starts and not contains and source.get("filterByModel") is not True:
+            problems.add(
+                where,
+                'no "types", "modelStartsWith" or "modelContains": it would go to every device '
+                '(the app skips it unless it is a news source with "filterByModel": true)',
+            )
         for ref in string_list(source, "supersededBy", where, problems):
             if ref == sid:
                 problems.add(where, "supersededBy points at itself")
@@ -132,6 +158,7 @@ def check_models(data, problems):
         problems.add("groups", "must be a non-empty list")
         return
     seen = {}
+    total = 0
     for index, group in enumerate(groups):
         where = f"groups[{index}]"
         if not isinstance(group, dict):
@@ -148,14 +175,21 @@ def check_models(data, problems):
         for name in names:
             if len(name.strip()) < 2:
                 problems.add(where, f'name "{name}" is too short')
+            if len(name.strip()) > MAX_NAME_LENGTH:
+                problems.add(where, f'name "{name[:30]}..." is longer than {MAX_NAME_LENGTH} characters')
             shown = name if brand and name.lower().startswith(brand.lower()) else f"{brand} {name}".strip()
             key = (gtype, shown.lower())
             if key in seen:
                 problems.add(where, f'"{shown}" is listed twice ({gtype})')
             seen[key] = True
+        total += len(names)
         for key in group:
             if key not in GROUP_KEYS:
                 problems.add(where, f'unknown field "{key}" (the app ignores it)')
+
+
+    if total > MAX_NAMES:
+        problems.add("groups", f"{total} names; the app reads at most {MAX_NAMES}")
 
 
 def git_show(ref, path):

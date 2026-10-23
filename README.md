@@ -55,6 +55,11 @@ stories are all relevant to its devices. The validator rejects it on update sour
 Adding a field that older app versions would misread (like this one: an old app would show the whole press feed
 unfiltered) needs a new `kind` value or a `schemaVersion` bump, because apps skip entries with an unknown `kind`.
 
+**Limits.** The app skips anything beyond these, and the validator rejects it: 200 sources; ids and names up to 120
+characters; urls up to 2,048; 50 entries per list; and a source needs at least one of `types`, `modelStartsWith`
+or `modelContains` (otherwise every device would fetch it), unless it is a news source with `filterByModel`.
+For `device_models.json`: names up to 100 characters and 50,000 names in total.
+
 A feed that is not RSS or Atom needs parser code in the app first. A source whose format the
 app cannot read is simply skipped there, so check that it works in the app before adding it.
 

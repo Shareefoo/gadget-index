@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "revision": 4,
+  "revision": 5,
   "groups": [
     {
       "type": "Watch",
@@ -299,9 +299,9 @@
         "9 Peak Pro",
         "5 Peak",
         "Run",
-        "3",
-        "7",
-        "9",
+        "Suunto 3",
+        "Suunto 7",
+        "Suunto 9",
         "9 Baro",
         "9 Peak",
         "Core",
@@ -444,8 +444,8 @@
       "type": "Watch",
       "brand": "Zepp",
       "names": [
-        "E",
-        "Z"
+        "Zepp E",
+        "Zepp Z"
       ]
     },
     {

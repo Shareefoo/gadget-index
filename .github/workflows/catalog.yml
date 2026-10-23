@@ -1,6 +1,6 @@
 name: Catalogue
 
-# Checks the two catalogue JSON files on every change, and publishes them with GitHub Pages
+# Checks the catalogue JSON files on every change, and publishes them with GitHub Pages
 # when they change on the default branch. The app downloads them from the Pages address (see README.md).
 
 on:
@@ -8,6 +8,7 @@ on:
     paths:
       - "source_catalog.json"
       - "device_models.json"
+      - "phone_models.json"
       - "tools/**"
       - "tests/**"
   push:
@@ -15,6 +16,7 @@ on:
     paths:
       - "source_catalog.json"
       - "device_models.json"
+      - "phone_models.json"
       - "tools/**"
       - "tests/**"
   workflow_dispatch:
@@ -62,7 +64,7 @@ jobs:
       - name: Collect the files to publish
         run: |
           mkdir -p _site
-          cp source_catalog.json device_models.json _site/
+          cp source_catalog.json device_models.json phone_models.json _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

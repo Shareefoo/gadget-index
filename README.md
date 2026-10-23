@@ -7,14 +7,16 @@ It holds only public source addresses and model names. No user data.
 | File | What it is |
 |---|---|
 | `source_catalog.json` | update and news sources, and which devices get them |
-| `device_models.json` | model names offered when adding a device |
+| `device_models.json` | model names offered when adding a device (watches, headphones, ...), kept by hand |
+| `phone_models.json` | phone and tablet names, **generated** from Google's public device list (do not edit) |
 
 Published (GitHub Pages) at:
 
 - <https://shareefoo.github.io/gadget-index/source_catalog.json>
 - <https://shareefoo.github.io/gadget-index/device_models.json>
+- <https://shareefoo.github.io/gadget-index/phone_models.json>
 
-The app also ships a copy of both files and uses whichever has the higher `revision`.
+The app also ships a copy of these files and uses whichever has the higher `revision`.
 
 ## Changing a file
 
@@ -58,7 +60,7 @@ unfiltered) needs a new `kind` value or a `schemaVersion` bump, because apps ski
 **Limits.** The app skips anything beyond these, and the validator rejects it: 200 sources; ids and names up to 120
 characters; urls up to 2,048; 50 entries per list; and a source needs at least one of `types`, `modelStartsWith`
 or `modelContains` (otherwise every device would fetch it), unless it is a news source with `filterByModel`.
-For `device_models.json`: names up to 100 characters and 50,000 names in total.
+For `device_models.json` and `phone_models.json`: names up to 100 characters and 50,000 names in total.
 
 A feed that is not RSS or Atom needs parser code in the app first. A source whose format the
 app cannot read is simply skipped there, so check that it works in the app before adding it.
@@ -75,6 +77,13 @@ Write names so the `modelStartsWith` / `modelContains` rules above match them, f
 "Samsung Galaxy Watch7", "Google Pixel Watch 3". Official spelling is preferred; users can
 always type a model that is not listed.
 
+### `phone_models.json`
+
+Same layout as `device_models.json` (all groups have type `Phone`; the app offers them for phones and tablets,
+one group per brand, about 33,000 names, roughly 170 KB compressed). Nobody edits it: `tools/build_phones.py`
+rebuilds it from Google's public list (`supported_devices.csv`) and raises `revision` by one only when the
+content changes. To add a phone Google's list lacks, the user types its name in the app.
+
 ## Checks and tools
 
 All standard-library Python 3, nothing to install.
@@ -83,6 +92,7 @@ All standard-library Python 3, nothing to install.
 |---|---|
 | `python3 tools/validate_catalog.py [--base origin/main]` | schema and consistency of both files; with `--base`, requires the revision bump |
 | `python3 -m unittest discover -s tests -v` | matching tests: `tests/matching.json` lists devices with the exact sources they must get, and `brandRules` check that every listed model of a brand still matches that brand's sources |
+| `python3 tools/build_phones.py [--check] [--input list.csv]` | rebuilds `phone_models.json`; refuses a download that is too small or far smaller than the current file |
 | `python3 tools/match.py Watch "Garmin Fenix 8"` | which sources one device gets |
 | `python3 tools/match.py --coverage` | how many models have a news or updates source, and the biggest brands with none |
 | `python3 tools/check_sources.py` | downloads every source and checks it still parses and has recent entries |
@@ -93,6 +103,10 @@ change in the app, change them here and in `tests/matching.json` too.
 Workflows:
 - **Catalogue** (`catalog.yml`): on every pull request and push it runs the tests, prints the coverage
   summary and validates; after a push to the default branch it publishes both files to GitHub Pages.
+- **Phone list** (`phones.yml`): every Wednesday it rebuilds `phone_models.json`. If it changed, the workflow
+  validates it, commits it to the default branch and starts the Catalogue workflow to publish it. A failing
+  run (Google moved or changed the file) commits nothing. It needs permission to push to the default branch;
+  with branch protection, change it to open a pull request.
 - **Source health** (`health.yml`): every Monday it runs `check_sources.py`. A broken source opens an issue
   ("Source health check failed"), later runs add to it, and it is closed when everything is healthy again.
   It can be started by hand from the Actions tab. Stale means: news older than 180 days, updates older

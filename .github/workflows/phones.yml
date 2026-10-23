@@ -1,0 +1,52 @@
+name: Phone list
+
+# Once a week, rebuilds phone_models.json from Google's public list of Android devices
+# (tools/build_phones.py). When the list changed it validates, commits the new file to the default
+# branch and starts the Catalogue workflow, which publishes it. A push made with the workflow's own
+# token does not start other workflows, so the Catalogue run is started explicitly.
+# If the download or its format looks wrong the run fails and nothing is committed.
+# Run it by hand from the Actions tab at any time.
+#
+# If the default branch is ever protected so that the workflow cannot push to it, change the commit
+# step to open a pull request instead.
+
+on:
+  schedule:
+    - cron: "43 4 * * 3"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: phone-list
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests
+        run: python3 -m unittest discover -s tests
+      - name: Rebuild phone_models.json
+        run: python3 tools/build_phones.py
+      - name: Validate
+        run: python3 tools/validate_catalog.py
+      - name: Commit and publish when it changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- phone_models.json; then
+            echo "Phone list unchanged." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          revision=$(python3 -c "import json; print(json.load(open('phone_models.json'))['revision'])")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add phone_models.json
+          git commit -m "Update the phone list (revision $revision)"
+          git push
+          gh workflow run catalog.yml --ref "${{ github.ref_name }}"
+          echo "Phone list updated to revision $revision and publishing." >> "$GITHUB_STEP_SUMMARY"

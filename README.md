@@ -42,8 +42,18 @@ To roll back, publish the older content with a **higher** revision.
       "types": ["Phone", "Tablet"],              // Phone, Watch, Headphones, Laptop, Tablet, Other; empty = any
       "modelStartsWith": ["Google"],             // any of these ...
       "modelContains": ["Pixel"],                // ... and any of these (case-insensitive); empty = any
-      "supersededBy": ["other-source-id"] } ] }  // dropped when one of these also matches
+      "supersededBy": ["other-source-id"],       // dropped when one of these also matches
+      "filterByModel": false } ] }               // news only: keep stories that mention the device's model
 ```
+
+**`filterByModel`** lets one general tech-news feed serve many brands. The app keeps only stories whose title or
+summary mentions the device's model (whole words, case-insensitive; "Galaxy Watch8" also finds "Galaxy Watch 8"),
+and does this before cutting the feed to its newest entries. A device with no real model name (`[YOUR MODEL]`)
+gets nothing from such a source. Use it for broad feeds (press sites); leave it off for a brand's own feed, whose
+stories are all relevant to its devices. The validator rejects it on update sources.
+
+Adding a field that older app versions would misread (like this one: an old app would show the whole press feed
+unfiltered) needs a new `kind` value or a `schemaVersion` bump, because apps skip entries with an unknown `kind`.
 
 A feed that is not RSS or Atom needs parser code in the app first. A source whose format the
 app cannot read is simply skipped there, so check that it works in the app before adding it.

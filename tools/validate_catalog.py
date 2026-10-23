@@ -27,7 +27,7 @@ MODELS = ROOT / "device_models.json"
 SUPPORTED_SCHEMA = 1
 DEVICE_TYPES = {"Phone", "Watch", "Headphones", "Laptop", "Tablet", "Other"}
 KINDS = {"updates", "news"}
-SOURCE_KEYS = {"id", "name", "kind", "url", "types", "modelStartsWith", "modelContains", "supersededBy"}
+SOURCE_KEYS = {"id", "name", "kind", "url", "types", "modelStartsWith", "modelContains", "supersededBy", "filterByModel"}
 GROUP_KEYS = {"type", "brand", "names"}
 
 
@@ -115,6 +115,11 @@ def check_sources(data, problems):
                 problems.add(where, "supersededBy points at itself")
             elif ref not in ids:
                 problems.add(where, f'supersededBy "{ref}" is not a source id')
+        if "filterByModel" in source:
+            if not isinstance(source["filterByModel"], bool):
+                problems.add(where, '"filterByModel" must be true or false')
+            elif source["filterByModel"] and source.get("kind") != "news":
+                problems.add(where, '"filterByModel" only applies to news sources (the app ignores it for updates)')
         for key in source:
             if key not in SOURCE_KEYS:
                 problems.add(where, f'unknown field "{key}" (the app ignores it)')

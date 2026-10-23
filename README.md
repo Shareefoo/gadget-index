@@ -30,30 +30,6 @@ The app also ships a copy of both files and uses whichever has the higher `revis
 
 To roll back, publish the older content with a **higher** revision.
 
-## Checks and tools
-
-All standard-library Python 3, nothing to install.
-
-| Command | What it does |
-|---|---|
-| `python3 tools/validate_catalog.py [--base origin/main]` | schema and consistency of both files; with `--base`, requires the revision bump |
-| `python3 -m unittest discover -s tests -v` | matching tests: `tests/matching.json` lists devices with the exact sources they must get, and `brandRules` check that every listed model of a brand still matches that brand's sources |
-| `python3 tools/match.py Watch "Garmin Fenix 8"` | which sources one device gets |
-| `python3 tools/match.py --coverage` | how many models have a news or updates source, and the biggest brands with none |
-| `python3 tools/check_sources.py` | downloads every source and checks it still parses and has recent entries |
-
-`tools/matching.py` is a copy of the app's matching rules (`SourceCatalog.kt` in Kithub). If the rules
-change in the app, change them here and in `tests/matching.json` too.
-
-Workflows:
-- **Catalogue** (`catalog.yml`): on every pull request and push it runs the tests, prints the coverage
-  summary and validates; after a push to the default branch it publishes both files to GitHub Pages.
-- **Source health** (`health.yml`): every Monday it runs `check_sources.py`. A broken source opens an issue
-  ("Source health check failed"), later runs add to it, and it is closed when everything is healthy again.
-  It can be started by hand from the Actions tab. Stale means: news older than 180 days, updates older
-  than 75 days. Some sites treat data-centre addresses differently from phones, so a failure is a prompt
-  to look at the source, not proof that it is broken in the app.
-
 ### `source_catalog.json`
 
 ```json
@@ -83,6 +59,30 @@ The picker shows `brand + name` (the brand is not repeated if the name already s
 Write names so the `modelStartsWith` / `modelContains` rules above match them, for example
 "Samsung Galaxy Watch7", "Google Pixel Watch 3". Official spelling is preferred; users can
 always type a model that is not listed.
+
+## Checks and tools
+
+All standard-library Python 3, nothing to install.
+
+| Command | What it does |
+|---|---|
+| `python3 tools/validate_catalog.py [--base origin/main]` | schema and consistency of both files; with `--base`, requires the revision bump |
+| `python3 -m unittest discover -s tests -v` | matching tests: `tests/matching.json` lists devices with the exact sources they must get, and `brandRules` check that every listed model of a brand still matches that brand's sources |
+| `python3 tools/match.py Watch "Garmin Fenix 8"` | which sources one device gets |
+| `python3 tools/match.py --coverage` | how many models have a news or updates source, and the biggest brands with none |
+| `python3 tools/check_sources.py` | downloads every source and checks it still parses and has recent entries |
+
+`tools/matching.py` is a copy of the app's matching rules (`SourceCatalog.kt` in Kithub). If the rules
+change in the app, change them here and in `tests/matching.json` too.
+
+Workflows:
+- **Catalogue** (`catalog.yml`): on every pull request and push it runs the tests, prints the coverage
+  summary and validates; after a push to the default branch it publishes both files to GitHub Pages.
+- **Source health** (`health.yml`): every Monday it runs `check_sources.py`. A broken source opens an issue
+  ("Source health check failed"), later runs add to it, and it is closed when everything is healthy again.
+  It can be started by hand from the Actions tab. Stale means: news older than 180 days, updates older
+  than 75 days. Some sites treat data-centre addresses differently from phones, so a failure is a prompt
+  to look at the source, not proof that it is broken in the app.
 
 ## Guidelines
 

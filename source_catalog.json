@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "revision": 3,
+  "revision": 4,
   "sources": [
     {
       "id": "android-security-bulletins",
@@ -65,6 +65,30 @@
       "kind": "news",
       "url": "https://www.garmin.com/en-US/blog/feed/",
       "modelStartsWith": ["Garmin"]
+    },
+    {
+      "id": "android-authority-press",
+      "name": "Android Authority",
+      "kind": "news",
+      "url": "https://www.androidauthority.com/feed/",
+      "types": ["Watch", "Headphones"],
+      "filterByModel": true
+    },
+    {
+      "id": "whathifi-press",
+      "name": "What Hi-Fi?",
+      "kind": "news",
+      "url": "https://www.whathifi.com/feeds/all",
+      "types": ["Headphones"],
+      "filterByModel": true
+    },
+    {
+      "id": "dcrainmaker-press",
+      "name": "DC Rainmaker",
+      "kind": "news",
+      "url": "https://www.dcrainmaker.com/feed",
+      "types": ["Watch"],
+      "filterByModel": true
     }
   ]
 }

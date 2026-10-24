@@ -23,7 +23,11 @@
     {"type": "Headphones", "model": "Sony WH-1000XM6", "updates": [], "news": ["android-authority-press", "whathifi-press"]},
     {"type": "Watch", "model": "Apple Watch Series 11", "updates": [], "news": ["android-authority-press", "dcrainmaker-press"]},
     {"type": "Laptop", "model": "Dell XPS 13", "updates": [], "news": []},
-    {"type": "Phone", "model": "  samsung galaxy s25  ", "updates": ["samsung-security-bulletins"], "news": ["google-android-blog", "samsung-mobile-news"]}
+    {"type": "Phone", "model": "  samsung galaxy s25  ", "updates": ["samsung-security-bulletins"], "news": ["google-android-blog", "samsung-mobile-news"]},
+    {"type": "Phone", "model": "Apple iPhone 16", "updates": [], "news": []},
+    {"type": "Phone", "model": "iPhone 15 Pro", "updates": [], "news": []},
+    {"type": "Tablet", "model": "Apple iPad Air", "updates": [], "news": []},
+    {"type": "Phone", "model": "Xiaomi Redmi Note 14", "updates": ["android-security-bulletins"], "news": ["google-android-blog"]}
   ],
   "brandRules": [
     {"type": "Watch", "brand": "Garmin", "news": ["garmin-blog"]},

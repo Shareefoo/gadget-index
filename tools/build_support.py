@@ -3,7 +3,8 @@
 
     python tools/build_support.py                    # download the pages, rewrite support.json if it changed
     python tools/build_support.py --pages DIR        # use saved copies (pixel_policy.html, pixel_dates.html,
-                                                     # samsung_scope.html) instead of downloading
+                                                     # samsung_scope.html, huawei_bulletin.html,
+                                                     # honor_bulletin.html) instead of downloading
     python tools/build_support.py --check            # exit 1 when the file would change; writes nothing
 
 Sources (nothing is guessed; every entry comes from one of these pages):
@@ -15,6 +16,9 @@ Sources (nothing is guessed; every entry comes from one of these pages):
 - Samsung, "Security Updates Scope" (security.samsungmobile.com/workScope.smsb): the models that get
   monthly, quarterly or biannual security updates now. It has no end dates; a Galaxy phone, tablet or
   watch that is not on it is "not on Samsung's list" (the source is marked "complete" for those types).
+- Huawei, "Security Bulletins for HUAWEI Phones/Tablets" (consumer.huawei.com/en/support/bulletin/) and
+  Honor, "MagicOS/Magic UI Security Updates" (honor.com/global/support/bulletin/): the same kind of list
+  (monthly, bi-monthly, quarterly) for their phones and tablets, also "complete".
 
 Layout (schema 1):
     { "schemaVersion": 1, "revision": 1,
@@ -40,10 +44,20 @@ OUTPUT = ROOT / "support.json"
 PIXEL_POLICY = "https://support.google.com/pixelphone/answer/4457705?hl=en"
 PIXEL_DATES = "https://support.google.com/pixelphone/answer/15738422?hl=en"
 SAMSUNG_SCOPE = "https://security.samsungmobile.com/workScope.smsb"
-PAGES = {"pixel_policy.html": PIXEL_POLICY, "pixel_dates.html": PIXEL_DATES, "samsung_scope.html": SAMSUNG_SCOPE}
+HUAWEI_BULLETIN = "https://consumer.huawei.com/en/support/bulletin/"
+HONOR_BULLETIN = "https://www.honor.com/global/support/bulletin/"
+PAGES = {
+    "pixel_policy.html": PIXEL_POLICY,
+    "pixel_dates.html": PIXEL_DATES,
+    "samsung_scope.html": SAMSUNG_SCOPE,
+    "huawei_bulletin.html": HUAWEI_BULLETIN,
+    "honor_bulletin.html": HONOR_BULLETIN,
+}
 
 MIN_PIXELS = 10  # the policy page lists about 30
 MIN_SAMSUNG = 50  # the scope page lists about 150
+MIN_HUAWEI = 10  # the bulletin page lists about 25
+MIN_HONOR = 20  # the bulletin page lists about 60
 MIN_SHARE_OF_PREVIOUS = 0.7
 MAX_DOWNLOAD = 8 * 1024 * 1024
 MONTHS = ["january", "february", "march", "april", "may", "june",
@@ -119,6 +133,36 @@ def parse_pixel_policy(page, dates):
     return models
 
 
+def parse_heading_lists(page, brand, cadences):
+    """Huawei's and Honor's pages: a <p class="des-tit"> heading names the cadence ("Models with monthly
+    security updates"), and each following <p class="des"> is "Series: Model, Model, ..." until the
+    next heading. Footnotes ("¹The models ...") have no "Series:" part and are skipped. The brand word is
+    taken out of the names ("HUAWEI Mate X6" -> "Mate X6"), as the app compares names without it."""
+    page = re.sub(r"<!--.*?-->", "", page, flags=re.S)
+    models = []
+    cadence = None
+    for kind, inner in re.findall(r'<p class="(des-tit|des)"[^>]*>(.*?)</p>', page, re.S):
+        line = re.sub(r"\s+", " ", text_of(inner))
+        if kind == "des-tit":
+            title = line.lower()
+            cadence = next((value for key, value in cadences if key in title), None)
+            continue
+        if cadence is None or ":" not in line or line[:1] in "¹²³":
+            continue
+        for name in line.split(":", 1)[1].split(","):
+            # "HUAWEI Mate XT | ULTIMATE DESIGN" is the Mate XT; the brand word goes wherever it is.
+            name = name.split("|")[0]
+            name = re.sub(rf"\b{re.escape(brand)}\b", " ", name, flags=re.I)
+            name = re.sub(r"\s+", " ", name).strip()
+            if len(name) >= 2:
+                models.append({"brand": brand.capitalize(), "name": name, "cadence": cadence})
+    return models
+
+
+# Longest first: "bi-monthly" also contains "monthly".
+HEADING_CADENCES = (("bi-monthly", "bimonthly"), ("monthly", "monthly"), ("quarterly", "quarterly"))
+
+
 def parse_samsung(page):
     """[{brand, name, cadence}] from the scope page (commented-out sections are skipped)."""
     page = re.sub(r"<!--.*?-->", "", page, flags=re.S)
@@ -143,6 +187,9 @@ SOURCES = [
     {"brand": "Google", "url": PIXEL_POLICY, "modelStartsWith": ["Google", "Pixel"], "types": ["Phone"], "complete": False},
     # The scope page lists every Galaxy phone, tablet and watch that still gets security updates.
     {"brand": "Samsung", "url": SAMSUNG_SCOPE, "modelStartsWith": ["Samsung", "Galaxy"], "types": ["Phone", "Tablet", "Watch"], "complete": True},
+    # Huawei's and Honor's pages cover their phones and tablets only (not watches or earbuds).
+    {"brand": "Huawei", "url": HUAWEI_BULLETIN, "modelStartsWith": ["Huawei"], "types": ["Phone", "Tablet"], "complete": True},
+    {"brand": "Honor", "url": HONOR_BULLETIN, "modelStartsWith": ["Honor"], "types": ["Phone", "Tablet"], "complete": True},
 ]
 
 
@@ -150,13 +197,15 @@ def build(pages):
     dates = parse_pixel_dates(pages["pixel_dates.html"])
     pixels = parse_pixel_policy(pages["pixel_policy.html"], dates)
     samsung = parse_samsung(pages["samsung_scope.html"])
-    if len(pixels) < MIN_PIXELS:
-        raise PageError(f"only {len(pixels)} Pixel phones read from the policy page")
-    if len(samsung) < MIN_SAMSUNG:
-        raise PageError(f"only {len(samsung)} Samsung models read from the scope page")
+    huawei = parse_heading_lists(pages["huawei_bulletin.html"], "huawei", HEADING_CADENCES)
+    honor = parse_heading_lists(pages["honor_bulletin.html"], "honor", HEADING_CADENCES)
+    for label, found, minimum in (("Pixel phones", pixels, MIN_PIXELS), ("Samsung models", samsung, MIN_SAMSUNG),
+                                  ("Huawei models", huawei, MIN_HUAWEI), ("Honor models", honor, MIN_HONOR)):
+        if len(found) < minimum:
+            raise PageError(f"only {len(found)} {label} read (expected at least {minimum})")
     seen = set()
     models = []
-    for entry in pixels + samsung:
+    for entry in pixels + samsung + huawei + honor:
         key = (entry["brand"], entry["name"].lower())
         if key not in seen:  # a model listed twice keeps its first (most supported) entry
             seen.add(key)

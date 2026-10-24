@@ -8,6 +8,8 @@ Rules
 - Every non-empty list narrows the match; an empty or missing list means "any".
 - `types`: the device type must be one of them.
 - `modelStartsWith` / `modelContains`: any entry matches, case-insensitive, on the trimmed model.
+- `modelNotStartsWith`: a model starting with any entry never matches (keeps Android-wide sources
+  away from an iPhone someone adds by name).
 - After matching, a source is dropped when one of its `supersededBy` ids also matched (same kind).
 - Sources with the same url are listed once.
 """
@@ -39,6 +41,8 @@ def matches(source, device_type, model):
         return False
     contains = source.get("modelContains") or []
     if contains and not any(c.lower() in text for c in contains):
+        return False
+    if any(text.startswith(n.lower()) for n in source.get("modelNotStartsWith") or []):
         return False
     return True
 

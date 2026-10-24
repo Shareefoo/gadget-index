@@ -46,6 +46,7 @@ To roll back, publish the older content with a **higher** revision.
       "types": ["Phone", "Tablet"],              // Phone, Watch, Headphones, Laptop, Tablet, Other; empty = any
       "modelStartsWith": ["Google"],             // any of these ...
       "modelContains": ["Pixel"],                // ... and any of these (case-insensitive); empty = any
+      "modelNotStartsWith": ["Apple"],           // never a model starting with one of these
       "supersededBy": ["other-source-id"],       // dropped when one of these also matches
       "filterByModel": false } ] }               // news only: keep stories that mention the device's model
 ```
@@ -55,6 +56,11 @@ summary mentions the device's model (whole words, case-insensitive; "Galaxy Watc
 and does this before cutting the feed to its newest entries. A device with no real model name (`[YOUR MODEL]`)
 gets nothing from such a source. Use it for broad feeds (press sites); leave it off for a brand's own feed, whose
 stories are all relevant to its devices. The validator rejects it on update sources.
+
+**`modelNotStartsWith`** keeps a broad source away from devices it does not apply to: the Android Security
+Bulletins and the Android blog go to every phone and tablet except one whose model starts with "Apple", "iPhone"
+or "iPad". It only narrows a match; it does not count as the rule a source needs. Older apps ignore it (they would
+still give those sources to an iPhone typed in by hand, which is harmless).
 
 Adding a field that older app versions would misread (like this one: an old app would show the whole press feed
 unfiltered) needs a new `kind` value or a `schemaVersion` bump, because apps skip entries with an unknown `kind`.
@@ -106,6 +112,14 @@ reads it from the makers' own pages and nothing in it is guessed:
   monthly, quarterly or biannual updates now, as `"cadence"`. It has no end dates. Its source is
   `"complete": true` for phones, tablets and watches: a Galaxy one that is not listed is shown as "not on
   Samsung's list of devices that get security updates".
+- Huawei's [security bulletins](https://consumer.huawei.com/en/support/bulletin/) and Honor's
+  [security updates](https://www.honor.com/global/support/bulletin/) pages: the same kind of list (monthly,
+  bi-monthly as `"bimonthly"`, quarterly) for their phones and tablets, also `"complete"`. The brand word is
+  left out of the names ("HUAWEI Mate X6" -> "Mate X6").
+
+Checked and not usable without a browser (October 2026): vivo (answers scripts with an error), OPPO (lists load
+with JavaScript, behind a captcha script), Xiaomi (page built with JavaScript), Motorola (refuses scripts), and
+no list found for OnePlus or Transsion. Their phones get no support claim.
 
 ```json
 { "schemaVersion": 1, "revision": 1,
@@ -115,7 +129,8 @@ reads it from the makers' own pages and nothing in it is guessed:
               { "brand": "Samsung", "name": "Galaxy S23", "cadence": "monthly" } ] }
 ```
 
-Up to 5,000 models; each has exactly one of `until`, `ended`, `cadence`. The pages are HTML, so a layout
+Up to 5,000 models; each has exactly one of `until`, `ended`, `cadence` (`monthly`, `bimonthly`, `quarterly`,
+`biannual` or `regular`). The pages are HTML, so a layout
 change makes the builder fail (it then writes nothing) until its parser is fixed.
 
 ## Checks and tools

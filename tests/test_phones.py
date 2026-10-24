@@ -51,12 +51,31 @@ class Parsing(unittest.TestCase):
         self.assertEqual(CSV, bp.decode(CSV.encode("utf-8-sig")))
 
 
+class Codes(unittest.TestCase):
+    def test_codes_that_do_not_read_as_the_name_are_kept_under_their_name(self):
+        groups = bp.parse(CSV)
+        codes = bp.parse_codes(CSV, groups)
+        self.assertEqual({"Galaxy S24": ["SM-S921B", "SM-S921U"], "Galaxy S25": ["SM-S931B"]}, codes["Samsung"])
+        # "Pixel 8" is already the name, so the Google phones need no codes.
+        self.assertNotIn("Google", codes)
+
+    def test_a_code_listed_for_several_names_goes_to_the_most_common_one(self):
+        text = CSV + '"Samsung","Galaxy S24 FE","s24fe","SM-S921B"\n"Samsung","Galaxy S24","s24y","SM-S921B"\n'
+        codes = bp.parse_codes(text, bp.parse(text))
+        self.assertIn("SM-S921B", codes["Samsung"]["Galaxy S24"])
+        self.assertNotIn("Galaxy S24 FE", codes["Samsung"])
+
+
 class Output(unittest.TestCase):
     def test_the_file_is_valid_json_with_the_model_list_layout(self):
-        doc = bp.document(bp.parse(CSV), 7)
+        groups = bp.parse(CSV)
+        doc = bp.document(groups, 7, bp.parse_codes(CSV, groups))
         data = json.loads(bp.render(doc))
         self.assertEqual({"schemaVersion": 1, "revision": 7}, {k: data[k] for k in ("schemaVersion", "revision")})
-        self.assertTrue(all(set(g) == {"type", "brand", "names"} and g["type"] == "Phone" for g in data["groups"]))
+        self.assertTrue(all({"type", "brand", "names"} <= set(g) <= {"type", "brand", "names", "codes"} for g in data["groups"]))
+        self.assertTrue(all(g["type"] == "Phone" for g in data["groups"]))
+        samsung = next(g for g in data["groups"] if g["brand"] == "Samsung")
+        self.assertTrue(set(samsung["codes"]) <= set(samsung["names"]))
 
 
 class Running(unittest.TestCase):

@@ -9,6 +9,7 @@ on:
       - "source_catalog.json"
       - "device_models.json"
       - "phone_models.json"
+      - "support.json"
       - "tools/**"
       - "tests/**"
   push:
@@ -17,6 +18,7 @@ on:
       - "source_catalog.json"
       - "device_models.json"
       - "phone_models.json"
+      - "support.json"
       - "tools/**"
       - "tests/**"
   workflow_dispatch:
@@ -64,7 +66,7 @@ jobs:
       - name: Collect the files to publish
         run: |
           mkdir -p _site
-          cp source_catalog.json device_models.json phone_models.json _site/
+          cp source_catalog.json device_models.json phone_models.json support.json _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

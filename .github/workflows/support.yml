@@ -1,0 +1,50 @@
+name: Support list
+
+# Once a week, rebuilds support.json (how long phones get security updates) from Google's Pixel
+# update pages and Samsung's security update scope page (tools/build_support.py). When it changed it
+# validates, commits the new file to the default branch and starts the Catalogue workflow, which
+# publishes it (a push made with the workflow's own token does not start other workflows).
+# If a page cannot be read or looks very different, the run fails and nothing is committed: check
+# the page and fix the parser. Run it by hand from the Actions tab at any time.
+
+on:
+  schedule:
+    - cron: "17 5 * * 3"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: support-list
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests
+        run: python3 -m unittest discover -s tests
+      - name: Rebuild support.json
+        run: python3 tools/build_support.py
+      - name: Validate
+        run: python3 tools/validate_catalog.py
+      - name: Commit and publish when it changed
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- support.json; then
+            echo "Support list unchanged." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          revision=$(python3 -c "import json; print(json.load(open('support.json'))['revision'])")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add support.json
+          git commit -m "Update the support list (revision $revision)"
+          git pull --rebase
+          git push
+          gh workflow run catalog.yml --ref "${{ github.ref_name }}"
+          echo "Support list updated to revision $revision and publishing." >> "$GITHUB_STEP_SUMMARY"

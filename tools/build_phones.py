@@ -11,8 +11,11 @@ a row needs a marketing name of at least 2 characters without "_" (those are bui
 is listed once per displayed name (the brand is not repeated when the name already starts with it).
 
 The output has the same layout as device_models.json (type "Phone"; the app offers these for phones and
-tablets), one group per brand. `revision` goes up by one only when the content changes, so running this
-twice in a row changes nothing. If the download looks wrong (too small, or far smaller than the current
+tablets), one group per brand, plus a "codes" object per group: marketing name -> the model codes Android
+reports for it (`Build.MODEL`, the list's Model column), so the app can show "Samsung Galaxy S10" for a
+phone that calls itself "SM-G973F". Codes that already read as the name ("Pixel 8") are left out, and a
+code listed for several names goes to the one it is listed with most. `revision` goes up by one only when
+the content changes, so running this twice in a row changes nothing. If the download looks wrong (too small, or far smaller than the current
 file, which means Google changed the format) nothing is written and the exit code is 1.
 Standard library only. Run weekly by .github/workflows/phones.yml.
 """
@@ -30,6 +33,7 @@ OUTPUT = ROOT / "phone_models.json"
 SOURCE_URL = "https://storage.googleapis.com/play_public/supported_devices.csv"
 MAX_DOWNLOAD = 12 * 1024 * 1024
 MAX_NAME_LENGTH = 100  # the app skips longer names
+MAX_CODE_LENGTH = 40  # and longer codes
 MIN_MODELS = 5000  # the list has about 40,000
 MIN_SHARE_OF_PREVIOUS = 0.8
 
@@ -72,11 +76,51 @@ def parse(text):
     }
 
 
-def document(groups, revision):
+def parse_codes(text, groups):
+    """{brand: {name: sorted codes}} for the names in [groups] (from parse) whose code is not readable."""
+    stored = {}  # displayed name, lower case -> (brand as in groups, name as in groups)
+    for brand, names in groups.items():
+        for name in names:
+            stored[displayed(brand, name).lower()] = (brand, name)
+    votes = {}  # code, lower case -> {(brand, name): rows}
+    spelling = {}  # code, lower case -> first spelling seen
+    rows = csv.reader(io.StringIO(text))
+    next(rows, None)
+    for row in rows:
+        if len(row) < 4:
+            continue
+        brand, name, code = row[0].strip(), row[1].strip(), row[3].strip()
+        target = stored.get(displayed(brand, name).lower())
+        if target is None or not code or len(code) > MAX_CODE_LENGTH:
+            continue
+        # "Pixel 8" for the Pixel 8: Android's own name is fine already.
+        if displayed(*target).lower().endswith(code.lower()):
+            continue
+        key = code.lower()
+        spelling.setdefault(key, code)
+        counts = votes.setdefault(key, {})
+        counts[target] = counts.get(target, 0) + 1
+    codes = {}
+    for key, counts in votes.items():
+        # Most rows win; ties go to the first one listed (dicts keep their order).
+        brand, name = max(counts, key=counts.get)
+        codes.setdefault(brand, {}).setdefault(name, []).append(spelling[key])
+    return {brand: {name: sorted(c, key=str.lower) for name, c in by_name.items()} for brand, by_name in codes.items()}
+
+
+def document(groups, revision, codes=None):
+    codes = codes or {}
+
+    def group(brand):
+        g = {"type": "Phone", "brand": brand, "names": groups[brand]}
+        if codes.get(brand):
+            g["codes"] = {name: codes[brand][name] for name in groups[brand] if name in codes[brand]}
+        return g
+
     return {
         "schemaVersion": 1,
         "revision": revision,
-        "groups": [{"type": "Phone", "brand": brand, "names": groups[brand]} for brand in sorted(groups, key=str.lower)],
+        "groups": [group(brand) for brand in sorted(groups, key=str.lower)],
     }
 
 
@@ -95,13 +139,14 @@ def count(groups):
 
 
 def previous():
-    """(revision, {brand: names}) of the current file; (0, {}) when there is none."""
+    """(revision, {brand: names}, {brand: {name: codes}}) of the current file; (0, {}, {}) when there is none."""
     try:
         old = json.loads(OUTPUT.read_text(encoding="utf-8"))
     except (FileNotFoundError, json.JSONDecodeError):
-        return 0, {}
+        return 0, {}, {}
     groups = {g["brand"]: g["names"] for g in old.get("groups", []) if isinstance(g, dict)}
-    return old.get("revision", 0), groups
+    codes = {g["brand"]: g["codes"] for g in old.get("groups", []) if isinstance(g, dict) and g.get("codes")}
+    return old.get("revision", 0), groups, codes
 
 
 def download():
@@ -121,12 +166,14 @@ def main():
 
     try:
         raw = Path(options.input).read_bytes() if options.input else download()
-        groups = parse(decode(raw))
+        text = decode(raw)
+        groups = parse(text)
+        codes = parse_codes(text, groups)
     except (OSError, UnicodeError, csv.Error) as e:
         print(f"Could not read the device list: {e}", file=sys.stderr)
         return 1
 
-    old_revision, old_groups = previous()
+    old_revision, old_groups, old_codes = previous()
     total, before = count(groups), count(old_groups)
     if total < MIN_MODELS or (before and total < before * MIN_SHARE_OF_PREVIOUS):
         print(
@@ -136,14 +183,15 @@ def main():
         )
         return 1
 
-    if groups == old_groups:
+    if groups == old_groups and codes == old_codes:
         print(f"Unchanged: {total} models, revision {old_revision}.")
         return 0
     if options.check:
         print(f"Would change: {before} -> {total} models.")
         return 1
-    OUTPUT.write_text(render(document(groups, old_revision + 1)), encoding="utf-8", newline="\n")
-    print(f"Wrote {OUTPUT.name}: {before} -> {total} models, revision {old_revision + 1}.")
+    OUTPUT.write_text(render(document(groups, old_revision + 1, codes)), encoding="utf-8", newline="\n")
+    coded = sum(len(c) for by_name in codes.values() for c in by_name.values())
+    print(f"Wrote {OUTPUT.name}: {before} -> {total} models ({coded} model codes), revision {old_revision + 1}.")
     return 0
 
 

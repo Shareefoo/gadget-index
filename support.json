@@ -1,4 +1,4 @@
-{"schemaVersion":1,"revision":2,"sources":[
+{"schemaVersion":1,"revision":3,"sources":[
 {"brand":"Google","url":"https://support.google.com/pixelphone/answer/4457705?hl=en","modelStartsWith":["Google","Pixel"],"types":["Phone"],"complete":false},
 {"brand":"Samsung","url":"https://security.samsungmobile.com/workScope.smsb","modelStartsWith":["Samsung","Galaxy"],"types":["Phone","Tablet","Watch"],"complete":true},
 {"brand":"Huawei","url":"https://consumer.huawei.com/en/support/bulletin/","modelStartsWith":["Huawei"],"types":["Phone","Tablet"],"complete":true},
@@ -125,6 +125,7 @@
 {"brand":"Samsung","name":"Galaxy M05","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy M06 5G","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy M07","cadence":"quarterly"},
+{"brand":"Samsung","name":"Galaxy M08","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy M14","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy M14 5G","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy M15 5G","cadence":"quarterly"},
@@ -144,6 +145,7 @@
 {"brand":"Samsung","name":"Galaxy F05","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy F06 5G","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy F07","cadence":"quarterly"},
+{"brand":"Samsung","name":"Galaxy F08","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy F14","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy F14 5G","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy F15 5G","cadence":"quarterly"},
@@ -154,8 +156,11 @@
 {"brand":"Samsung","name":"Galaxy F54 5G","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy F55 5G","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy F56 5G","cadence":"quarterly"},
+{"brand":"Samsung","name":"Galaxy F70 5G","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy F70 Pro 5G","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy F70e 5G","cadence":"quarterly"},
+{"brand":"Samsung","name":"Galaxy Tab S12+","cadence":"quarterly"},
+{"brand":"Samsung","name":"Galaxy Tab S12 Ultra","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy Tab S11","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy Tab S11 Ultra","cadence":"quarterly"},
 {"brand":"Samsung","name":"Galaxy Tab S10+","cadence":"quarterly"},
